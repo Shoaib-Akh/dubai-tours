@@ -5,30 +5,27 @@ import one from "../assets/Images/one.png";
 import two from "../assets/Images/two.png";
 
 const DubaiToursScreen = () => {
-  const [imageIndex, setImageIndex] = useState(0); // Controls which image to show
-  const [fadeAnim] = useState(new Animated.Value(0)); // Fade animation for the second image
-  const [showContent, setShowContent] = useState(false); // Controls when to show the ScrollView
-  const [language, setLanguage] = useState("en"); // Default language: English
+  const [imageIndex, setImageIndex] = useState(0); 
+  const [fadeAnim] = useState(new Animated.Value(0)); 
+  const [showContent, setShowContent] = useState(false); 
+  const [language, setLanguage] = useState("en"); 
 
   useEffect(() => {
-    // Show the second image after 1 second
     const imageTimeout = setTimeout(() => {
       setImageIndex(1);
       Animated.timing(fadeAnim, {
-        toValue: 1, // Fully visible
-        duration: 1000, // 1-second fade-in
+        toValue: 1, 
+        duration: 1000,
         useNativeDriver: true,
       }).start(() => {
-        // Show ScrollView after the second image animation completes
-        setTimeout(() => setShowContent(true), 500); // 500ms delay
+
+        setTimeout(() => setShowContent(true), 500);
       });
     }, 1000);
-
-    // Detect device language
     const deviceLanguage = Localize?.getLocales()[0]?.languageCode;
     setLanguage(deviceLanguage === "ar" ? "ar" : "en");
 
-    return () => clearTimeout(imageTimeout); // Cleanup timeout
+    return () => clearTimeout(imageTimeout); 
   }, []);
 
   const translations = {
@@ -125,7 +122,7 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: "100%",
-    height: "100%", // Full screen image size, adjust as necessary
+    height: "100%", 
     backgroundColor: "black",
     marginBottom: 16,
   },
@@ -202,22 +199,22 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   button: {
-    backgroundColor: '#00A0E4', // Primary color for the button
+    backgroundColor: '#00A0E4', 
     paddingVertical: 14,
     paddingHorizontal: 32,
-    borderRadius: 25, // Rounded corners for the button
-    shadowColor: '#00A0E4', // Shadow color for the effect
+    borderRadius: 25, 
+    shadowColor: '#00A0E4', 
     shadowOpacity: 0.3,
     shadowRadius: 10,
-    elevation: 6, // Elevation for Android shadow effect
+    elevation: 6,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 50, // Height of the button
+    height: 50,
   },
   buttonText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#FFF', // White text color
+    color: '#FFF',
     textTransform: 'uppercase',
   },
   languageToggle: {
