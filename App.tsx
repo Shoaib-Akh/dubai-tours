@@ -10,7 +10,9 @@ const Stack = createNativeStackNavigator();
 
 function App() {
   useEffect(() => {
-    SplashScreen.hide(); 
+    setTimeout(() => {
+      SplashScreen.hide();
+    }, 1000); 
   }, []);
 
   return (

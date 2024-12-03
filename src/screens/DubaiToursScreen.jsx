@@ -1,65 +1,119 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView ,Image,TouchableOpacity,DevSettings} from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, DevSettings, Animated } from "react-native";
+import * as Localize from "react-native-localize";
+import one from "../assets/Images/one.png";
+import two from "../assets/Images/two.png";
 
 const DubaiToursScreen = () => {
+  const [imageIndex, setImageIndex] = useState(0); // Controls which image to show
+  const [fadeAnim] = useState(new Animated.Value(0)); // Fade animation for the second image
+  const [showContent, setShowContent] = useState(false); // Controls when to show the ScrollView
+  const [language, setLanguage] = useState("en"); // Default language: English
+
+  useEffect(() => {
+    // Show the second image after 1 second
+    const imageTimeout = setTimeout(() => {
+      setImageIndex(1);
+      Animated.timing(fadeAnim, {
+        toValue: 1, // Fully visible
+        duration: 1000, // 1-second fade-in
+        useNativeDriver: true,
+      }).start(() => {
+        // Show ScrollView after the second image animation completes
+        setTimeout(() => setShowContent(true), 500); // 500ms delay
+      });
+    }, 1000);
+
+    // Detect device language
+    const deviceLanguage = Localize?.getLocales()[0]?.languageCode;
+    setLanguage(deviceLanguage === "ar" ? "ar" : "en");
+
+    return () => clearTimeout(imageTimeout); // Cleanup timeout
+  }, []);
+
+  const translations = {
+    en: {
+      overview: "Overview",
+      comingSoon: "COMING SOON",
+      welcome: "Welcome to Dubai Tours!",
+      intro: "We are thrilled to have you embark on a journey through the vibrant and dynamic city of Dubai. Whether you’re here to explore the stunning skyline, indulge in world-class shopping, or experience the rich cultural heritage, our app is your perfect companion.",
+      discover: "Discover hidden gems, plan your itinerary, and get insider tips to make the most of your visit. From the iconic Burj Khalifa to the serene beaches, Dubai offers something for every traveler.",
+      thanks: "Thank you for choosing our app to guide you through this incredible city. We hope you have an unforgettable experience!",
+      regards: "Warm regards,\nThe Dubai Tours Team",
+      footer: "Designing & Developing By:",
+      buttonText: "MK Brands Marketing",
+    },
+    ar: {
+      overview: "نظرة عامة",
+      comingSoon: "قريبًا",
+      welcome: "مرحبًا بكم في جولات دبي!",
+      intro: "يسعدنا أن ترافقنا في رحلة عبر المدينة النابضة بالحياة والديناميكية، دبي. سواء كنت هنا لاستكشاف الأفق المذهل، أو الانغماس في التسوق العالمي، أو تجربة التراث الثقافي الغني، فإن تطبيقنا هو رفيقك المثالي.",
+      discover: "اكتشف الجواهر الخفية، وخطط لمسار رحلتك، واحصل على نصائح من الداخل للاستفادة القصوى من زيارتك. من برج خليفة الأيقوني إلى الشواطئ الهادئة، تقدم دبي شيئًا لكل مسافر.",
+      thanks: "شكرًا لاختيارك تطبيقنا لإرشادك في هذه المدينة الرائعة. نتمنى لك تجربة لا تُنسى!",
+      regards: "أطيب التحيات،\nفريق جولات دبي",
+      footer: "تصميم وتطوير بواسطة:",
+      buttonText: "MK Brands Marketing",
+    },
+  };
+
   const handlePress = () => {
-    // Reload the app
     DevSettings.reload();
   };
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-      
-      <Image 
-      source={require('../assets/Images/logo.png')} 
-      style={{ width: 50, height: 50,marginRight:10 }} // Adjust width and height as needed
-    />
-        <Text style={styles.title}>Top Vision Tourism</Text>
-      </View>
+    <>
+      {!showContent && (
+        <View style={styles.imageContainer}>
+          {imageIndex === 0 && (
+            <Animated.Image source={one} style={[styles.fullScreenImage, { opacity: 1 }]} />
+          )}
+          {imageIndex === 1 && (
+            <Animated.Image source={two} style={[styles.fullScreenImage, { opacity: fadeAnim }]} />
+          )}
+        </View>
+      )}
+      {showContent && (
+        <ScrollView contentContainerStyle={styles.container}>
+          <View style={styles.header}>
+            <Image
+              source={require("../assets/Images/logo.png")}
+              style={{ width: 50, height: 50, marginRight: 10 }}
+            />
+            <Text style={styles.title}>Top Vision Tourism</Text>
+            <TouchableOpacity
+              style={styles.languageToggle}
+              onPress={() => setLanguage(language === "en" ? "ar" : "en")}
+            >
+              <Text style={styles.languageText}>{language === "en" ? "AR" : "EN"}</Text>
+            </TouchableOpacity>
+          </View>
 
-      {/* Tabs */}
-      <View style={styles.tabs}>
-        <Text style={[styles.tab, styles.activeTab]}>Overview</Text>
-        <Text style={styles.tab}>COMING SOON</Text>
-      </View>
+          <View style={styles.tabs}>
+            <Text style={[styles.tab, styles.activeTab]}>{translations[language].overview}</Text>
+            <Text style={styles.tab}>{translations[language].comingSoon}</Text>
+          </View>
 
-      {/* Main Content */}
-      <View style={styles.content} >
-      <View >
-        <Text style={styles.heading}>Welcome to Dubai Tours!</Text>
-        <Text style={styles.bodyText}>
-          We are thrilled to have you embark on a journey through the vibrant
-          and dynamic city of Dubai. Whether you’re here to explore the stunning
-          skyline, indulge in world-class shopping, or experience the rich
-          cultural heritage, our app is your perfect companion.
-        </Text>
-        <Text style={styles.bodyText}>
-          Discover hidden gems, plan your itinerary, and get insider tips to
-          make the most of your visit. From the iconic Burj Khalifa to the
-          serene beaches, Dubai offers something for every traveler.
-        </Text>
-        <Text style={styles.bodyText}>
-          Thank you for choosing our app to guide you through this incredible
-          city. We hope you have an unforgettable experience!
-        </Text>
-        
-      </View>
-      <Text style={styles.signature}>
-          Warm regards,{"\n"}
-          The Dubai Tours Team
-        </Text>
-      </View>
-     
+          <View style={styles.content}>
+            <View>
+              <Text style={styles.heading}>{translations[language].welcome}</Text>
 
-      {/* Footer */}
-      <View style={styles.buttonContainer}>
-        <Text>Designing & Developing By:</Text>
-      <TouchableOpacity style={styles.button} onPress={handlePress}>
-        <Text style={styles.buttonText}>MK Brands Marketing</Text>
-      </TouchableOpacity>
-    </View>
-    </ScrollView>
+              <Text style={styles.bodyText}>{translations[language].intro}</Text>
+              <Text style={styles.bodyText}>{translations[language].discover}</Text>
+              <Text style={styles.bodyText}>{translations[language].thanks}</Text>
+
+            </View>
+            <Text style={styles.signature}>{translations[language].regards}</Text>
+          </View>
+
+          <Text>{translations[language].footer}</Text>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.button} onPress={handlePress}>
+              <Text style={styles.buttonText}>{translations[language].buttonText}</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      )}
+    </>
   );
 };
 
@@ -69,10 +123,22 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "#F9FAFB",
   },
+  imageContainer: {
+    width: "100%",
+    height: "100%", // Full screen image size, adjust as necessary
+    backgroundColor: "black",
+    marginBottom: 16,
+  },
+  fullScreenImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 16,
+    justifyContent: "space-between"
   },
   logo: {
     fontSize: 24,
@@ -109,10 +175,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     marginBottom: 16,
-    flex:1,
-    flexDirection:"column",
-    justifyContent:"space-between",
-    height:400,
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "space-between",
+
   },
   heading: {
     fontSize: 20,
@@ -154,6 +220,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFF', // White text color
     textTransform: 'uppercase',
+  },
+  languageToggle: {
+    backgroundColor: "#00A0E4",
+    borderRadius: 20,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  languageText: {
+    color: "#FFF",
+    fontWeight: "bold",
   },
 });
 
