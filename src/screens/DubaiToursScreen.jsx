@@ -212,7 +212,6 @@ const styles = StyleSheet.create({
     elevation: 6, // Elevation for Android shadow effect
     alignItems: 'center',
     justifyContent: 'center',
-    width: 200, // Width of the button
     height: 50, // Height of the button
   },
   buttonText: {
