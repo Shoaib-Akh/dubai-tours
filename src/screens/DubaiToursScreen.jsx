@@ -8,12 +8,14 @@ import {
   TouchableOpacity,
   DevSettings,
   Animated,
+  ActivityIndicator,
 } from "react-native";
 import * as Localize from "react-native-localize";
 import one from "../assets/Images/one.png";
 import two from "../assets/Images/two.png";
 import { useTheme } from "@react-navigation/native";
-
+import { getTranslation } from "../components/getTranslation";
+import * as RNLocalize from "react-native-localize";
 const DubaiToursScreen = () => {
   const { colors } = useTheme(); // Access theme colors
   const [imageIndex, setImageIndex] = useState(0);
@@ -22,7 +24,9 @@ const DubaiToursScreen = () => {
   const [showContent, setShowContent] = useState(false);
   const [language, setLanguage] = useState("en");
 
+
   useEffect(() => {
+
     const imageTimeout = setTimeout(() => {
       setImageIndex(1);
       Animated.timing(fadeAnim, {
@@ -42,46 +46,30 @@ const DubaiToursScreen = () => {
     }, 2000);
 
     const deviceLanguage = Localize?.getLocales()[0]?.languageCode;
-    setLanguage(deviceLanguage === "ar" ? "ar" : "en");
+    setLanguage(deviceLanguage);
 
     return () => clearTimeout(imageTimeout);
   }, []);
 
-  const translations = {
-    en: {
-      overview: "Overview",
-      comingSoon: "COMING SOON",
-      welcome: "Welcome to Dubai Tours!",
-      intro:
-        "We are thrilled to have you embark on a journey through the vibrant and dynamic city of Dubai. Whether you’re here to explore the stunning skyline, indulge in world-class shopping, or experience the rich cultural heritage, our app is your perfect companion.",
-      discover:
-        "Discover hidden gems, plan your itinerary, and get insider tips to make the most of your visit. From the iconic Burj Khalifa to the serene beaches, Dubai offers something for every traveler.",
-      thanks:
-        "Thank you for choosing our app to guide you through this incredible city. We hope you have an unforgettable experience!",
-      regards: "Warm regards,\nThe Dubai Tours Team",
-      footer: "Designing & Developing By:",
-      buttonText: "MK Brands Marketing",
-    },
-    ar: {
-      overview: "نظرة عامة",
-      comingSoon: "قريبًا",
-      welcome: "مرحبًا بكم في جولات دبي!",
-      intro:
-        "يسعدنا أن ترافقنا في رحلة عبر المدينة النابضة بالحياة والديناميكية، دبي. سواء كنت هنا لاستكشاف الأفق المذهل، أو الانغماس في التسوق العالمي، أو تجربة التراث الثقافي الغني، فإن تطبيقنا هو رفيقك المثالي.",
-      discover:
-        "اكتشف الجواهر الخفية، وخطط لمسار رحلتك، واحصل على نصائح من الداخل للاستفادة القصوى من زيارتك. من برج خليفة الأيقوني إلى الشواطئ الهادئة، تقدم دبي شيئًا لكل مسافر.",
-      thanks:
-        "شكرًا لاختيارك تطبيقنا لإرشادك في هذه المدينة الرائعة. نتمنى لك تجربة لا تُنسى!",
-      regards: "أطيب التحيات،\nفريق جولات دبي",
-      footer: "تصميم وتطوير بواسطة:",
-      buttonText: "MK Brands Marketing",
-    },
-  };
+
 
   const handlePress = () => {
     DevSettings.reload();
   };
+  const [translations, setTranslations] = useState({});
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchTranslations = async () => {
+      setLoading(true);
+      const translatedTexts = await getTranslation(language); // Pass the selected language to the function
+      setTranslations(translatedTexts);
+      setLoading(false);
+    };
 
+    fetchTranslations();
+  }, [language]);
+
+  const deviceLanguage = RNLocalize.getLocales()[0].languageCode
   return (
     <>
       {!showContent && (
@@ -90,12 +78,14 @@ const DubaiToursScreen = () => {
             <Animated.Image source={one} style={[styles.fullScreenImage, { opacity: 1 }]} />
           )}
           {imageIndex === 1 && (
-                    <Animated.Image source={two} style={[styles.twoFullScreenImage, { opacity: fadeAnim }]} />
+            <Animated.Image source={two} style={[styles.twoFullScreenImage, { opacity: fadeAnim }]} />
 
           )}
         </View>
       )}
       {showContent && (
+
+
         <Animated.View
           style={{
             flex: 1,
@@ -126,43 +116,54 @@ const DubaiToursScreen = () => {
               <Text style={[styles.title, { color: colors.text }]}>Top Vision Tourism</Text>
               <TouchableOpacity
                 style={styles.languageToggle}
-                onPress={() => setLanguage(language === "en" ? "ar" : "en")}
+                onPress={() => setLanguage(language === "en" ? deviceLanguage : "en")}
               >
-                <Text style={styles.languageText}>{language === "en" ? "AR" : "EN"}</Text>
+                <Text style={styles.languageText}>{language === "en" ? deviceLanguage : "en"}</Text>
               </TouchableOpacity>
             </View>
 
             <View style={styles.tabs}>
               <Text style={[styles.tab, styles.activeTab, { color: colors.primary }]}>
-                {translations[language].overview}
+                {translations.overview}
               </Text>
               <Text style={[styles.tab, { color: colors.text }]}>
-                {translations[language].comingSoon}
+                {translations.comingSoon}
               </Text>
             </View>
 
             <View style={[styles.content, { backgroundColor: colors.card }]}>
-              <Text style={[styles.heading, { color: colors.text }]}>
-                {translations[language].welcome}
-              </Text>
-              <Text style={[styles.bodyText, { color: colors.text }]}>
-                {translations[language].intro}
-              </Text>
-              <Text style={[styles.bodyText, { color: colors.text }]}>
-                {translations[language].discover}
-              </Text>
-              <Text style={[styles.bodyText, { color: colors.text }]}>
-                {translations[language].thanks}
-              </Text>
-              <Text style={[styles.signature, { color: colors.text }]}>
-                {translations[language].regards}
-              </Text>
+
+              {
+                loading ?
+                  <View style={{ display: "flex", justifyContent: "center", alignItems: "center", height: 300 }}>
+                    <ActivityIndicator size="large" color="#6200ee" />
+                  </View>
+                  :
+                  <>
+                    <Text style={[styles.heading, { color: colors.text }]}>
+                      {translations.welcome}
+                    </Text>
+                    <Text style={[styles.bodyText, { color: colors.text }]}>
+                      {translations.intro}
+                    </Text>
+                    <Text style={[styles.bodyText, { color: colors.text }]}>
+                      {translations.discover}
+                    </Text>
+                    <Text style={[styles.bodyText, { color: colors.text }]}>
+                      {translations.thanks}
+                    </Text>
+                    <Text style={[styles.signature, { color: colors.text }]}>
+                      {translations.regards}
+                    </Text>
+                  </>
+              }
+
             </View>
 
-            <Text style={{ color: colors.text }}>{translations[language].footer}</Text>
+            <Text style={{ color: colors.text }}>{translations.footer}</Text>
             <View style={styles.buttonContainer}>
               <TouchableOpacity style={styles.button} onPress={handlePress}>
-                <Text style={styles.buttonText}>{translations[language].buttonText}</Text>
+                <Text style={styles.buttonText}>{translations.buttonText}</Text>
               </TouchableOpacity>
             </View>
           </ScrollView>
@@ -266,8 +267,9 @@ const styles = StyleSheet.create({
   languageText: {
     color: "#FFF",
     fontWeight: "bold",
+    textTransform: "uppercase",
   },
-  twoFullScreenImage:{
+  twoFullScreenImage: {
     width: "100%",
     height: "100%",
     resizeMode: "stretch",

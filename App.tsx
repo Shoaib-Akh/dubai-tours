@@ -10,12 +10,21 @@ import { LightTheme, DarkThemes } from './src/assets/colors/themes';
 const Stack = createNativeStackNavigator();
 
 function App() {
-  useEffect(() => {
-    setTimeout(() => {
-      SplashScreen.hide();
-    }, 5000);
-  }, []);
 
+
+
+  // const handleHideSplashScreen = () => {
+  //   SplashScreen.hide(); 
+  // };
+  useEffect(() => {
+    // Show splash screen initially
+    const timer = setTimeout(() => {
+      console.log("SplashScreen hidden",SplashScreen);
+      SplashScreen.hide(); // Hide splash screen after 2 seconds
+    }, 5000);
+
+    return () => clearTimeout(timer); // Cleanup timeout on unmount
+  }, []);
   const colorScheme = useColorScheme();
 
   return (
