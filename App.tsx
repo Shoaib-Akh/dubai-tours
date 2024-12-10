@@ -1,36 +1,36 @@
-import React, { useEffect } from 'react';
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { View, Animated, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import SplashScreen from 'react-native-splash-screen';
-import { useColorScheme } from 'react-native';
-import DetailsScreen from './src/screens/DetailsScreen'; // @ts-ignore
 import DubaiToursScreen from './src/screens/DubaiToursScreen'; // @ts-ignore
-import { LightTheme, DarkThemes } from './src/assets/colors/themes';
+import DetailsScreen from './src/screens/DetailsScreen'; // @ts-ignore
 
 const Stack = createNativeStackNavigator();
 
-function App() {
-
-
-
-  // const handleHideSplashScreen = () => {
-  //   SplashScreen.hide(); 
-  // };
+const App = () => {
+  const [isSplashVisible, setIsSplashVisible] = useState(true); // Control splash visibility
   useEffect(() => {
-    // Show splash screen initially
+    // Hide the splash screen after 3 seconds
     const timer = setTimeout(() => {
-      console.log("SplashScreen hidden",SplashScreen);
-      SplashScreen.hide(); // Hide splash screen after 2 seconds
-    }, 5000);
+      setIsSplashVisible(false);
+    }, 3000); // Set your desired splash screen duration
 
-    return () => clearTimeout(timer); // Cleanup timeout on unmount
+    return () => clearTimeout(timer); // Cleanup timer on unmount
   }, []);
-  const colorScheme = useColorScheme();
+
+  if (isSplashVisible) {
+    return (
+      <View style={styles.container}>
+        <Animated.Image
+          source={require('./src/assets/Images/splash_screen.png')} // Update with your image
+          style={[styles.fullScreenImage, ]}
+        />
+      </View>
+    );
+  }
 
   return (
-    <NavigationContainer
-      theme={colorScheme === 'dark' ? DarkThemes : LightTheme}
-    >
+    <NavigationContainer>
       <Stack.Navigator
         initialRouteName="Home"
         screenOptions={{
@@ -40,9 +40,7 @@ function App() {
         <Stack.Screen
           name="Home"
           component={DubaiToursScreen}
-          options={{
-            headerShown: false,
-          }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Details"
@@ -54,6 +52,18 @@ function App() {
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff', // Set background color to match the splash screen
+  },
+  fullScreenImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover', // Adjust to fit the screen
+  },
+});
 
 export default App;
