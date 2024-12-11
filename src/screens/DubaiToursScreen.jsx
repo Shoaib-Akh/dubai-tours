@@ -10,23 +10,22 @@ import {
   Animated,
   ActivityIndicator,
 } from "react-native";
-import * as Localize from "react-native-localize";
 import one from "../assets/Images/one.png";
 import two from "../assets/Images/two.png";
 import { useTheme } from "@react-navigation/native";
 import { getTranslation } from "../components/getTranslation";
-import * as RNLocalize from "react-native-localize";
+import * as RNLocalize from 'react-native-localize';
+
 const DubaiToursScreen = () => {
   const { colors } = useTheme(); // Access theme colors
   const [imageIndex, setImageIndex] = useState(0);
   const [fadeAnim] = useState(new Animated.Value(0));
   const [contentAnim] = useState(new Animated.Value(0));
   const [showContent, setShowContent] = useState(false);
+  const [translations, setTranslations] = useState({});
+  const [loading, setLoading] = useState(true);
   const [language, setLanguage] = useState("en");
-
-
   useEffect(() => {
-
     const imageTimeout = setTimeout(() => {
       setImageIndex(1);
       Animated.timing(fadeAnim, {
@@ -45,31 +44,35 @@ const DubaiToursScreen = () => {
       });
     }, 2000);
 
-    const deviceLanguage = Localize?.getLocales()[0]?.languageCode;
+    const deviceLanguage = RNLocalize?.getLocales()[0]?.languageCode;
     setLanguage(deviceLanguage);
 
     return () => clearTimeout(imageTimeout);
   }, []);
-
-
+  useEffect(() => {
+    const initializeTranslations = async () => {
+      setLoading(true);
+      const deviceLanguage = RNLocalize?.getLocales()[0]?.languageCode || "en";
+      setLanguage(deviceLanguage);
+      const translatedTexts = await getTranslation(deviceLanguage);
+      setTranslations(translatedTexts);
+      setLoading(false);
+    };
+    initializeTranslations();
+  }, []);
 
   const handlePress = () => {
     DevSettings.reload();
   };
-  const [translations, setTranslations] = useState({});
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    const fetchTranslations = async () => {
-      setLoading(true);
-      const translatedTexts = await getTranslation(language); // Pass the selected language to the function
-      setTranslations(translatedTexts);
-      setLoading(false);
-    };
-
-    fetchTranslations();
-  }, [language]);
-
-  const deviceLanguage = RNLocalize.getLocales()[0].languageCode
+  const deviceLanguage = RNLocalize?.getLocales()[0]?.languageCode
+  const handleLanguageToggle = async () => {
+    const newLanguage = language === "en" ? RNLocalize?.getLocales()[0]?.languageCode || "en" : "en";
+    setLanguage(newLanguage);
+    setLoading(true);
+    const translatedTexts = await getTranslation(newLanguage);
+    setTranslations(translatedTexts);
+    setLoading(false);
+  };
   return (
     <>
       {!showContent && (
@@ -116,7 +119,7 @@ const DubaiToursScreen = () => {
               <Text style={[styles.title, { color: colors.text }]}>Top Vision Tourism</Text>
               <TouchableOpacity
                 style={styles.languageToggle}
-                onPress={() => setLanguage(language === "en" ? deviceLanguage : "en")}
+                onPress={handleLanguageToggle}
               >
                 <Text style={styles.languageText}>{language === "en" ? deviceLanguage : "en"}</Text>
               </TouchableOpacity>
