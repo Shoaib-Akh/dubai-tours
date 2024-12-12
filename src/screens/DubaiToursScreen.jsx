@@ -55,10 +55,7 @@ const DubaiToursScreen = () => {
       setLoading(true);
       const deviceLanguage = RNLocalize?.getLocales()[0]?.languageCode || "en";
       setLanguage(deviceLanguage);
-
       const translatedTexts = await getTranslation(deviceLanguage) || texts.en;
-      console.log("translatedTexts", translatedTexts);
-
       setTranslations(translatedTexts);
       setLoading(false);
     };
@@ -118,20 +115,20 @@ const DubaiToursScreen = () => {
                 />
               </View>
               <TouchableOpacity
-              
+
               // onPress={() => navigate.navigate("LoginScreen")}
-              
+
               >
 
                 <Text style={[styles.title, { color: colors.text }]}>Top Vision Tourism</Text>
               </TouchableOpacity>
-              {deviceLanguage !== "en" &&
+              {deviceLanguage !== "en" ?
                 <TouchableOpacity
                   style={styles.languageToggle}
                   onPress={handleLanguageToggle}
                 >
                   <Text style={styles.languageText}>{language === "en" ? deviceLanguage : "en"}</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> : <View></View>
               }
 
             </View>
@@ -165,7 +162,7 @@ const DubaiToursScreen = () => {
                     </Text>
                     <Text style={[styles.bodyText, { color: colors.text }]}>
                       {translations.thanks}
-                    </Text> 
+                    </Text>
                     <Text style={[styles.signature, { color: colors.text }]}>
                       {translations.ToursTeam}
                     </Text>

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Animated, StyleSheet } from 'react-native';
+import { View, Animated, StyleSheet, useColorScheme } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DubaiToursScreen from './src/screens/DubaiToursScreen'; // @ts-ignore
 import LoginScreen from './src/screens/LoginScreen'; // @ts-ignore
-
+import { LightTheme, DarkThemes } from './src/assets/colors/themes';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
+  const colorScheme = useColorScheme();
   const [isSplashVisible, setIsSplashVisible] = useState(true); // Control splash visibility
   useEffect(() => {
     // Hide the splash screen after 3 seconds
@@ -30,7 +31,9 @@ const App = () => {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer
+    
+    theme={colorScheme === 'dark' ? DarkThemes : LightTheme}>
       <Stack.Navigator
         initialRouteName="Home"
         screenOptions={{
@@ -67,3 +70,5 @@ const styles = StyleSheet.create({
 });
 
 export default App;
+
+

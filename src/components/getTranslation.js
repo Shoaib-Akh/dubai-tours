@@ -3,24 +3,21 @@ import * as RNLocalize from "react-native-localize";
 
 const GOOGLE_TRANSLATE_URL = "https://translate.googleapis.com/translate_a/single";
 import texts from "../assets/translations/translations.json";
-import { log } from '../../node_modules/@types/node/util.d';
 
 export const getTranslation = async (deviceLanguage) => {
   try {
     // Get the device language
-   
+
 
     // Ensure texts are in the correct format (assuming "en" is the source language)
     const textsArray = Object.keys(texts.en); // Extract all keys (like 'overview', 'comingSoon', etc.)
-if (RNLocalize?.getLocales()[0]?.languageCode=="en") {
-  console.log("en already");
-  
-  return
-}
+    if (RNLocalize?.getLocales()[0]?.languageCode == "en") {
+
+      return
+    }
     // Map over each key to create a translation request for each individual text
     const translations = await Promise.all(
       textsArray.map(async (key) => {
-        console.log("language: " + key);
         const textToTranslate = texts.en[key]; // Original text in English
         const response = await axios.get(GOOGLE_TRANSLATE_URL, {
           params: {
