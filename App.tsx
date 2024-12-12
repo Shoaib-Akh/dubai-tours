@@ -3,7 +3,7 @@ import { View, Animated, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DubaiToursScreen from './src/screens/DubaiToursScreen'; // @ts-ignore
-import DetailsScreen from './src/screens/DetailsScreen'; // @ts-ignore
+import LoginScreen from './src/screens/LoginScreen'; // @ts-ignore
 
 const Stack = createNativeStackNavigator();
 
@@ -43,8 +43,8 @@ const App = () => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="Details"
-          component={DetailsScreen}
+          name="LoginScreen"
+          component={LoginScreen}
           options={{
             animation: 'slide_from_bottom', // Specific animation for this screen
           }}

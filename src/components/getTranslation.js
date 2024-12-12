@@ -3,30 +3,44 @@ import * as RNLocalize from "react-native-localize";
 
 const GOOGLE_TRANSLATE_URL = "https://translate.googleapis.com/translate_a/single";
 import texts from "../assets/translations/translations.json";
+import { log } from '../../node_modules/@types/node/util.d';
 
 export const getTranslation = async (deviceLanguage) => {
   try {
-    // Combine all texts into a single string, separated by a delimiter
-    const delimiter = "|||";
-    const combinedTexts = Object.values(texts.en).join(delimiter);
+    // Get the device language
+   
 
-    // Make a single API request to translate the combined texts
-    const response = await axios.get(GOOGLE_TRANSLATE_URL, {
-      params: {
-        client: "gtx", // Required client parameter
-        sl: "en", // Source language (English)
-        tl: deviceLanguage, // Target language (device language)
-        dt: "t", // Translate text
-        q: combinedTexts, // Combined text to translate
-      },
-    });
+    // Ensure texts are in the correct format (assuming "en" is the source language)
+    const textsArray = Object.keys(texts.en); // Extract all keys (like 'overview', 'comingSoon', etc.)
+if (RNLocalize?.getLocales()[0]?.languageCode=="en") {
+  console.log("en already");
+  
+  return
+}
+    // Map over each key to create a translation request for each individual text
+    const translations = await Promise.all(
+      textsArray.map(async (key) => {
+        console.log("language: " + key);
+        const textToTranslate = texts.en[key]; // Original text in English
+        const response = await axios.get(GOOGLE_TRANSLATE_URL, {
+          params: {
+            client: "gtx", // Required client parameter
+            sl: "en", // Source language (English)
+            tl: deviceLanguage, // Target language (device language)
+            dt: "t", // Translate text
+            q: textToTranslate, // Text to translate
+          },
+        });
+        // Extract the translated text
+        const translatedText = response.data[0][0][0];
+        return { key, translation: translatedText }; // Return the translated text
+      })
+    );
 
-    // Split the translated text back into individual texts
-    const translatedArray = response.data[0][0][0].split(delimiter);
 
-    // Map translated texts back to their keys
-    const translatedTexts = Object.keys(texts.en).reduce((acc, key, index) => {
-      acc[key] = translatedArray[index];
+    // Create a new object with the translated texts for the device language
+    const translatedTexts = translations.reduce((acc, { key, translation }) => {
+      acc[key] = translation;
       return acc;
     }, {});
 

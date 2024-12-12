@@ -12,11 +12,12 @@ import {
 } from "react-native";
 import one from "../assets/Images/one.png";
 import two from "../assets/Images/two.png";
-import { useTheme } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import { getTranslation } from "../components/getTranslation";
 import * as RNLocalize from 'react-native-localize';
-
+import texts from "../assets/translations/translations.json";
 const DubaiToursScreen = () => {
+  const navigate = useNavigation()
   const { colors } = useTheme(); // Access theme colors
   const [imageIndex, setImageIndex] = useState(0);
   const [fadeAnim] = useState(new Animated.Value(0));
@@ -54,7 +55,10 @@ const DubaiToursScreen = () => {
       setLoading(true);
       const deviceLanguage = RNLocalize?.getLocales()[0]?.languageCode || "en";
       setLanguage(deviceLanguage);
-      const translatedTexts = await getTranslation(deviceLanguage);
+
+      const translatedTexts = await getTranslation(deviceLanguage) || texts.en;
+      console.log("translatedTexts", translatedTexts);
+
       setTranslations(translatedTexts);
       setLoading(false);
     };
@@ -87,8 +91,6 @@ const DubaiToursScreen = () => {
         </View>
       )}
       {showContent && (
-
-
         <Animated.View
           style={{
             flex: 1,
@@ -115,14 +117,23 @@ const DubaiToursScreen = () => {
                   style={{ width: 50, height: 50 }}
                 />
               </View>
-
-              <Text style={[styles.title, { color: colors.text }]}>Top Vision Tourism</Text>
               <TouchableOpacity
-                style={styles.languageToggle}
-                onPress={handleLanguageToggle}
+              
+              // onPress={() => navigate.navigate("LoginScreen")}
+              
               >
-                <Text style={styles.languageText}>{language === "en" ? deviceLanguage : "en"}</Text>
+
+                <Text style={[styles.title, { color: colors.text }]}>Top Vision Tourism</Text>
               </TouchableOpacity>
+              {deviceLanguage !== "en" &&
+                <TouchableOpacity
+                  style={styles.languageToggle}
+                  onPress={handleLanguageToggle}
+                >
+                  <Text style={styles.languageText}>{language === "en" ? deviceLanguage : "en"}</Text>
+                </TouchableOpacity>
+              }
+
             </View>
 
             <View style={styles.tabs}>
@@ -154,6 +165,9 @@ const DubaiToursScreen = () => {
                     </Text>
                     <Text style={[styles.bodyText, { color: colors.text }]}>
                       {translations.thanks}
+                    </Text> 
+                    <Text style={[styles.signature, { color: colors.text }]}>
+                      {translations.ToursTeam}
                     </Text>
                     <Text style={[styles.signature, { color: colors.text }]}>
                       {translations.regards}
@@ -166,7 +180,7 @@ const DubaiToursScreen = () => {
             <Text style={{ color: colors.text }}>{translations.footer}</Text>
             <View style={styles.buttonContainer}>
               <TouchableOpacity style={styles.button} onPress={handlePress}>
-                <Text style={styles.buttonText}>{translations.buttonText}</Text>
+                <Text style={styles.buttonText}>MK Brands Marketing</Text>
               </TouchableOpacity>
             </View>
           </ScrollView>
